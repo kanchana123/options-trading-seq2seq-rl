@@ -8,7 +8,6 @@ The core of the project is its ability to autoregressively generate multi-leg op
 
 The following animation showcases the agent's decision-making process over a week of trading. It visualizes the agent's portfolio value, the underlying stock price, and, most importantly, the **Transformer's cross-attention mechanism**. The heatmap shows what parts of the stock's recent price history the model is "looking at" when considering which options to trade.
 
-![Agent Attention Heatmap Screenshort](assets/test_result.png)
 ![Agent Attention Heatmap](assets/agent_2D_heatmap.gif)
 
 ---
