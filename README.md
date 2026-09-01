@@ -33,6 +33,54 @@ By penalizing the agent for high delta, the PPO algorithm learns to select trade
 
 ## Model Architecture
 
+```mermaid
+flowchart TD
+    %% High-Contrast Dark Theme Styling
+    classDef default color:#ffffff;
+    classDef inputStyle fill:#064e3b,stroke:#34d399,stroke-width:2px,color:#f0fdf4;
+    classDef encStyle fill:#1e3a5f,stroke:#60a5fa,stroke-width:2px,color:#eff6ff;
+    classDef decStyle fill:#78350f,stroke:#fbbf24,stroke-width:2px,color:#fffbeb;
+    classDef rlStyle fill:#4c1d95,stroke:#c084fc,stroke-width:2px,color:#faf5ff;
+    classDef envStyle fill:#831843,stroke:#f472b6,stroke-width:2px,color:#fdf2f8;
+
+    %% 1. Market Input
+    subgraph Inputs ["Multi-Modal Market State (111 Tokens)"]
+        INP["Portfolio State + 80 Option Greeks + Stock History"]:::inputStyle
+    end
+
+    %% 2. Encoder
+    subgraph EncoderBlock ["Transformer Encoder"]
+        ENC["Self-Attention & Feature Extraction<br/>(Contextual Memory Bank)"]:::encStyle
+    end
+
+    %% 3. Decoder
+    subgraph DecoderBlock ["Autoregressive Transformer Decoder"]
+        DEC["Masked Self-Attention & Cross-Attention<br/>(Query Market Context)"]:::decStyle
+    end
+
+    %% 4. PPO Heads
+    subgraph PolicyHeads ["PPO Dual-Head Policy Network"]
+        direction LR
+        ACTOR["Actor Head<br/>(Trade Generator: Action, Strike, Lot)"]:::rlStyle
+        CRITIC["Critic Head<br/>(Portfolio Value Estimation)"]:::rlStyle
+    end
+
+    %% 5. Environment
+    subgraph RL_Env ["Gymnasium Trading Environment"]
+        ENV["Options Market Simulation<br/>(Delta-Neutral Reward Penalty: λ=100)"]:::envStyle
+    end
+
+    %% Connections
+    Inputs --> ENC
+    ENC ==>|Keys & Values| DEC
+    DEC --> ACTOR
+    DEC --> CRITIC
+
+    ACTOR -->|Execute Trade Sequence| ENV
+    ACTOR -.->|Autoregressive Feedback| DEC
+    ENV -.->|Next State & Shaped Reward| Inputs
+```
+
 The model is an encoder-decoder Transformer designed for sequence generation.
 
 #### Encoder
